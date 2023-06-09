@@ -26,25 +26,13 @@ class UrlDownloaderTest {
             new DownloadResource("http://web.archive.org/web/20131021165347im_/http://ia.media-imdb.com/images/M/MV5BODE4OTc5MDUyN15BMl5BanBnXkFtZTgwMDk5Mzc0MDE@._V1._SY200_CR50,0,200,200_.jpg", "small", "mr-banks.jpg")
     );
 
-    // Resource's size is between 1 MB and 100 MB
-    private static final List<DownloadResource> mediumResources = List.of(
-            new DownloadResource("https://codeload.github.com/facebook/react/zip/refs/tags/v18.2.0", "medium", "react-18.2.0.zip"),
-            new DownloadResource("https://codeload.github.com/spring-projects/spring-framework/zip/refs/tags/v6.0.9", "medium", "spring-framework-6.0.9.zip")
-    );
-
-    private Downloader downloader = new UrlDownloader();
+    private final Downloader downloader = new UrlDownloader();
 
     @Test
     @DisplayName("Test small resources")
     void testDownloadSmallResources() {
         smallResources.forEach(this::testDownloadResource);
     }
-
-//    @Test
-//    @DisplayName("Test medium resources")
-//    void testDownloadMediumResources() {
-//        mediumResources.forEach(this::testDownloadResource);
-//    }
 
     private void testDownloadResource(DownloadResource resource) {
         final Path toPath = Path.of(TMP_DIRECTORY, resource.relativeDirPath());
