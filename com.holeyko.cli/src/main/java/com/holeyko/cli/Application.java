@@ -13,27 +13,31 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class Application {
+    private static final String EXIT_MESSAGE = "Enter exit to get out";
+
     public static void main(String[] args) {
         try (var input = new BufferedReader(
                 new InputStreamReader(System.in, StandardCharsets.UTF_8)
         )) {
             String choice;
             while (true) {
-                System.out.println("""
-                        Choose an action' number:
-                            1. Parse HTML file
-                            2. Download a file rom URL
-                        Enter exist to get out
-                        """);
-                choice = input.readLine().toLowerCase().trim();
-                if ("1".equals(choice)) {
-                    parseHtml(input);
-                } else if ("2".equals(choice)) {
-                    downloadFile(input);
-                } else if ("exit".equals(choice)) {
-                    return;
-                } else {
-                    System.out.println("There is no your choice");
+                try {
+                    System.out.println("""
+                            Choose an action' number:
+                                1. Parse HTML file
+                                2. Download a file rom URL
+                            """ + EXIT_MESSAGE);
+                    choice = input.readLine().toLowerCase().trim();
+                    testExit(choice);
+                    if ("1".equals(choice)) {
+                        parseHtml(input);
+                    } else if ("2".equals(choice)) {
+                        downloadFile(input);
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.err.println("There is no your command");
                 }
             }
         } catch (IOException e) {
@@ -46,32 +50,58 @@ public class Application {
                 Choose a number of a HTML's source:
                     1. URL
                     2. Local file
-                Enter exist to get out""");
-        final String choice = input.readLine().toLowerCase().trim();
+                """ + EXIT_MESSAGE
+        );
+        String choice = input.readLine().toLowerCase().trim();
+        testExit(choice);
 
-        try {
-            final InputStream htmlInputStream;
-            if ("1".equals(choice)) {
-                System.out.println("Enter the URL:");
-                htmlInputStream = new URL(input.readLine()).openStream();
-            } else if ("2".equals(choice)) {
-                System.out.println("Enter path to html:");
-                htmlInputStream = new FileInputStream(input.readLine());
-            } else if ("exist".equals(choice)) {
-                return;
-            } else {
-                System.out.println("There is no your choice");
-                return;
-            }
-
-            try (var parser = new HTMLParser(htmlInputStream)) {
-                System.out.println(parser.parse());
-            } catch (ParseException e) {
-                System.err.println(e.getMessage());
+        try (final InputStream htmlInputStream = getHtmlInputStream(choice, input)) {
+            System.out.println("""
+                    Choose a number of a result parsing:
+                        1. Console
+                        2. File
+                    """ + EXIT_MESSAGE
+            );
+            choice = input.readLine().trim().toLowerCase();
+            testExit(choice);
+            try {
+                try (var parser = new HTMLParser(htmlInputStream)) {
+                    String result = parser.parse().toString();
+                    switch (choice) {
+                        case "1" -> System.out.println(result);
+                        case "2" -> {
+                            System.out.println("Enter path to file:");
+                            choice = input.readLine().trim().toLowerCase();
+                            try (BufferedWriter output = new BufferedWriter(
+                                    new FileWriter(choice, StandardCharsets.UTF_8)
+                            )) {
+                                output.write(result + '\n');
+                            }
+                        }
+                        default -> throw new IllegalArgumentException();
+                    }
+                } catch (ParseException e) {
+                    System.err.println(e.getMessage());
+                }
+            } catch (IOException e) {
+                System.err.printf("Can't write to output. %s%n", e.getMessage());
             }
         } catch (IOException e) {
-            System.err.println("Can't handle source of html. %s"
-                    .formatted(e.getMessage()));
+            System.err.printf("Can't handle source of html. %s%n", e.getMessage());
+        }
+    }
+
+    private static InputStream getHtmlInputStream(String choice, BufferedReader input) throws IOException {
+        switch (choice) {
+            case "1" -> {
+                System.out.println("Enter the URL:");
+                return new URL(input.readLine()).openStream();
+            }
+            case "2" -> {
+                System.out.println("Enter path to html:");
+                return new FileInputStream(input.readLine());
+            }
+            default -> throw new IllegalArgumentException();
         }
     }
 
@@ -97,8 +127,13 @@ public class Application {
             downloader.download(url, dir, name);
             System.out.println("The file was downloaded");
         } catch (IOException e) {
-            System.err.println("Cant' download the file. %s"
-                    .formatted(e.getMessage()));
+            System.err.printf("Cant' download the file. %s%n", e.getMessage());
+        }
+    }
+
+    private static void testExit(String choice) {
+        if ("exit".equals(choice)) {
+            System.exit(0);
         }
     }
 }

@@ -58,7 +58,7 @@
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
-                            <finalName>web-parser</finalName>
+                            <finalName>web-parser-cli</finalName>
                             <outputDirectory>..</outputDirectory>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
