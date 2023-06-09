@@ -1,20 +1,16 @@
 package com.holeyko.parser.impl;
 
-import com.holeyko.downloader.Downloader;
-import com.holeyko.downloader.impl.UrlDownloader;
 import com.holeyko.parser.Parser;
 import com.holeyko.parser.exception.ParseException;
 import com.holeyko.parser.model.HTMLElement;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.net.URL;
 import java.util.List;
 
 class HTMLParserTest {
@@ -22,7 +18,6 @@ class HTMLParserTest {
     }
 
     private static final String PATH_TO_RESOURCES = "src/test/resources";
-    private static final String TMP_DIRECTORY = "tmp";
     private static final HTMLFileParsed BLANK_HTML = new HTMLFileParsed(
             PATH_TO_RESOURCES + "/correct/blank.html",
             HTMLElement.builder().tag("html").build()
@@ -181,14 +176,8 @@ class HTMLParserTest {
     @Test
     @DisplayName("Online HTML")
     void testOnlineHtml() throws IOException {
-        Downloader downloader = new UrlDownloader();
-        int htmlNumber = 1;
         for (String url : URLS) {
-            String fileName = "html%d.html".formatted(htmlNumber++);
-            downloader.download(url, Path.of(TMP_DIRECTORY), fileName);
-            try (Parser<HTMLElement> parser = new HTMLParser(
-                    new FileInputStream(TMP_DIRECTORY + "/" + fileName)
-            )) {
+            try (var parser = new HTMLParser(new URL(url).openStream())) {
                 Assertions.assertDoesNotThrow(parser::parse, "URL: %s"
                         .formatted(url));
             }
@@ -205,38 +194,6 @@ class HTMLParserTest {
     @DisplayName("No close comment")
     void testNoCloseComment() throws IOException {
         testIncorrectHtml(PATH_TO_RESOURCES + "/incorrect/no-close-comment.html");
-    }
-
-    @BeforeAll
-    static void createTmpDirectory() throws IOException {
-        Files.createDirectories(Path.of(TMP_DIRECTORY));
-    }
-
-    @AfterAll
-    static void removeTmpDirectory() throws IOException {
-        Files.walkFileTree(Path.of(TMP_DIRECTORY), new FileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
     }
 
     private void testPreparedParsing(HTMLFileParsed prepared) throws IOException {
