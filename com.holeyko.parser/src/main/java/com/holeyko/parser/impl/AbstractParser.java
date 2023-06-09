@@ -70,7 +70,7 @@ public abstract class AbstractParser<T> implements Parser<T> {
 
     private void readInput() throws ParseException {
         try {
-            int read = input.read(buffer, readLimit, buffer.length - readLimit);
+            final int read = input.read(buffer, readLimit, buffer.length - readLimit);
             if (read == -1) {
                 isInputEnd = true;
                 return;
@@ -92,7 +92,7 @@ public abstract class AbstractParser<T> implements Parser<T> {
     }
 
     protected char next() throws ParseException {
-        char result = lookup();
+        final char result = lookup();
         ++countSkipChars;
         ++curBufferIndex;
 
@@ -212,7 +212,7 @@ public abstract class AbstractParser<T> implements Parser<T> {
     }
 
     protected String parseUntilExclude(ParseCheck checkContinue, ParseCheck checkExclude) throws ParseException {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         while (canRead() && checkContinue.check()) {
             if (checkExclude.check()) {
                 throw new ParseException("Unexpected token at %d position"

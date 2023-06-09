@@ -66,9 +66,7 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
 
             final String plainText = parsePlainText(context);
             if (!plainText.isBlank()) {
-                context.parent().addChild(
-                        HTMLElement.builder().value(plainText).build()
-                );
+                context.parent().addChild(HTMLElement.builder().value(plainText).build());
             }
 
             skipUnnecessary();
@@ -85,10 +83,10 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     }
 
     private String parsePlainText(TagContext context) throws ParseException {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         switch (context.environment()) {
             case STYLE, SCRIPT -> {
-                String closeTag = makeCloseTag(context.parent().getTag());
+                final String closeTag = makeCloseTag(context.parent().getTag());
                 while (canRead() && !checkString(closeTag, false)) {
                     result.append(next());
                 }
@@ -111,7 +109,7 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
             return null;
         }
 
-        HTMLElement htmlElement = new HTMLElement();
+        final HTMLElement htmlElement = new HTMLElement();
         skipUnnecessary();
         htmlElement.setTag(parseTagName());
         skipUnnecessary();
@@ -140,10 +138,9 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     }
 
     private void parseAttributes(HTMLElement htmlElement) throws ParseException {
-        String attributeName;
         do {
             skipUnnecessary();
-            attributeName = parseUntilExclude(
+            final String attributeName = parseUntilExclude(
                     () -> !Character.isWhitespace(lookup()) &&
                             !checkListString(List.of(ASSIGN, FINAL_END_OPEN_TAG, END_OPEN_TAG)),
                     () -> checkString(BEGIN_OPEN_TAG)
@@ -154,8 +151,8 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
                     htmlElement.addAttributeWithoutArgs(attributeName);
                 } else {
                     checkStringAndSkip(ASSIGN);
-                    String quote = Character.toString(next());
-                    String attributeValue = parseUntilExclude(
+                    final String quote = Character.toString(next());
+                    final String attributeValue = parseUntilExclude(
                             () -> !checkString(quote),
                             () -> checkString(BEGIN_OPEN_TAG)
                     );
