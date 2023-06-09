@@ -58,12 +58,12 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
 
     private void parseTag(TagContext context) throws ParseException {
         final String closeTag = makeCloseTag(context.parent().getTag());
+        skipUnnecessary();
         while (canRead() && !checkString(closeTag, false)) {
             if (checkString(BEGIN_CLOSE_TAG)) {
                 require(closeTag);
             }
 
-            skipUnnecessary();
             final String plainText = parsePlainText(context);
             if (!plainText.isBlank()) {
                 context.parent().addChild(
@@ -76,10 +76,11 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
             if (htmlElement != null) {
                 if (!htmlElement.isSingle() && !htmlElement.isVoid()) {
                     parseTag(new TagContext(htmlElement, makeTagEnvironment(htmlElement)));
-                    require(makeCloseTag(htmlElement.getTag()));
+                    require(makeCloseTag(htmlElement.getTag()), false);
                 }
                 context.parent().addChild(htmlElement);
             }
+            skipUnnecessary();
         }
     }
 

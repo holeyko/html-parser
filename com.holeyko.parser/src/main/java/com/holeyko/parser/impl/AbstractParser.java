@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractParser<T> implements Parser<T> {
@@ -118,14 +119,15 @@ public abstract class AbstractParser<T> implements Parser<T> {
     protected boolean checkString(String s, boolean sensitive) throws ParseException {
         int curPos = 0;
         boolean result = true;
+        Comparator<Character> characterComparator = sensitive ? Character::compare :
+                (l, r) -> Character.compare(Character.toLowerCase(l), Character.toLowerCase(r));
+
         while (curPos < s.length()) {
-            if (!canRead() || sensitive ?
-                    lookup() != s.charAt(curPos) :
-                    Character.toLowerCase(lookup()) != Character.toLowerCase(s.charAt(curPos))
-            ) {
+            if (!canRead() || characterComparator.compare(lookup(), s.charAt(curPos)) != 0) {
                 result = false;
                 break;
             }
+
             ++curBufferIndex;
             ++curPos;
         }
