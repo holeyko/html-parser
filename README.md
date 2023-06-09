@@ -8,6 +8,7 @@ mvn clean install
 ```
 
 ## Run Application
+All dependencies are already in the jar file. You can run the application without Maven. \
 Command to run the application:
 ```
 java -jar ${jarfile-name.jar}
