@@ -142,9 +142,10 @@ class HTMLParserTest {
                     .build()
     );
     private static final List<String> URLS = List.of(
-            "https://www.kgeorgiy.info/courses/java-advanced/homeworks.html",
             "https://www.virustotal.com/gui/home/upload",
-            "https://vk.com/search?c%5Bsection%5D=communities"
+            "https://www.kgeorgiy.info/courses/java-advanced/homeworks.html",
+            "https://lichess.org/",
+            "https://www.overleaf.com/"
     );
 
     @Test
@@ -211,7 +212,7 @@ class HTMLParserTest {
         Files.createDirectories(Path.of(TMP_DIRECTORY));
     }
 
-//    @AfterAll
+    @AfterAll
     static void removeTmpDirectory() throws IOException {
         Files.walkFileTree(Path.of(TMP_DIRECTORY), new FileVisitor<>() {
             @Override
