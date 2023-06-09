@@ -173,7 +173,7 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     private void skipComments() throws ParseException {
         if (checkStringAndSkip(BEGIN_COMMENT)) {
             parseUntilString(List.of(END_COMMENT));
-            checkStringAndSkip(END_COMMENT);
+            require(END_COMMENT);
         }
     }
 
@@ -196,7 +196,7 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     }
 
     private TagEnvironment makeTagEnvironment(HTMLElement htmlElement) {
-        return switch (htmlElement.getTag()) {
+        return switch (htmlElement.getTag().toLowerCase()) {
             case "script" -> TagEnvironment.SCRIPT;
             case "style" -> TagEnvironment.STYLE;
             default -> TagEnvironment.HTML;
