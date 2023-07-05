@@ -24,7 +24,7 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     private static final String BEGIN_COMMENT = "<!--";
     private static final String END_COMMENT = "-->";
     private static final String ASSIGN = "=";
-    private static final String DOCTYPE_HTML = "<!DOCTYPE html>";
+    private static final String DOCTYPE_HTML_START = "<!DOCTYPE";
     private static final List<String> VOID_TAGS = List.of(
             "area", "base", "br", "col", "command", "embed",
             "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"
@@ -175,7 +175,11 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
     }
 
     private void skipDoctype() throws ParseException {
-        checkStringAndSkip(DOCTYPE_HTML, false);
+        if (checkString(DOCTYPE_HTML_START, false)) {
+            checkStringAndSkip(DOCTYPE_HTML_START, false);
+            parseUntilString(List.of(">"));
+            require(">");
+        }
     }
 
     private void skipUnnecessary() throws ParseException {
