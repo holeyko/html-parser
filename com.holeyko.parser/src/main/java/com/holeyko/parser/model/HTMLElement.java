@@ -57,6 +57,36 @@ public class HTMLElement {
                 .collect(Collectors.joining("\n"));
     }
 
+    public String toHTML() {
+        if (value != null) {
+            return value;
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append("<").append(tag).append(" ");
+        for (var attr : attributes.entrySet()) {
+            result.append(attr.getKey()).append("=\"")
+                    .append(attr.getValue()).append("\"").append(" ");
+        }
+        result.deleteCharAt(result.length() - 1);
+
+        if (isSingle) {
+            result.append("/>");
+        } else if (isVoid) {
+            result.append(">");
+        } else {
+            result.append(">");
+            StringBuilder childrenHTML = new StringBuilder("\n");
+            children.forEach((child -> childrenHTML.append(child.toHTML()).append("\n")));
+            childrenHTML.deleteCharAt(childrenHTML.length() - 1);
+            result.append(childrenHTML.toString().lines()
+                    .map(line -> '\t' + line).collect(Collectors.joining("\n"))
+            ).append("\n").append("</").append(tag).append(">");
+        }
+
+        return result.toString();
+    }
+
     public static HTMLElementBuilder builder() {
         return new HTMLElementBuilder();
     }

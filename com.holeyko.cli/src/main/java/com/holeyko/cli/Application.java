@@ -4,6 +4,7 @@ import com.holeyko.downloader.Downloader;
 import com.holeyko.downloader.impl.UrlDownloader;
 import com.holeyko.parser.exception.ParseException;
 import com.holeyko.parser.impl.HTMLParser;
+import com.holeyko.parser.model.HTMLElement;
 
 import java.io.*;
 import java.net.URL;
@@ -56,15 +57,33 @@ public class Application {
         try (final InputStream htmlInputStream = getHtmlInputStream(choice, input)) {
             System.out.println("""
                     Choose a number of a result parsing:
-                        1. Console
-                        2. File
+                        1. Own ToString
+                        2. HTML
                     """ + EXIT_MESSAGE
             );
+
             choice = input.readLine().trim().toLowerCase();
             testExit(choice);
             try {
                 try (var parser = new HTMLParser(htmlInputStream)) {
-                    String result = parser.parse().toString();
+                    HTMLElement root = parser.parse();
+                    String result;
+
+                    switch (choice) {
+                        case "1" -> result = root.toString();
+                        case "2" -> result = root.toHTML();
+                        default -> throw new IllegalArgumentException();
+                    }
+
+                    System.out.println("""
+                            Choose a number of a result output:
+                                1. Console
+                                2. File
+                            """ + EXIT_MESSAGE
+                    );
+                    choice = input.readLine().trim().toLowerCase();
+                    testExit(choice);
+
                     switch (choice) {
                         case "1" -> System.out.println(result);
                         case "2" -> {
