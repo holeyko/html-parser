@@ -29,12 +29,10 @@ public class Application {
                             """ + EXIT_MESSAGE);
                     choice = input.readLine().toLowerCase().trim();
                     testExit(choice);
-                    if ("1".equals(choice)) {
-                        parseHtml(input);
-                    } else if ("2".equals(choice)) {
-                        downloadFile(input);
-                    } else {
-                        throw new IllegalArgumentException();
+                    switch (choice) {
+                        case "1" -> parseHtml(input);
+                        case "2" -> downloadFile(input);
+                        default -> throw new IllegalArgumentException();
                     }
                 } catch (IllegalArgumentException e) {
                     System.err.println("There is no your command");
