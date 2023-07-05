@@ -140,7 +140,10 @@ class HTMLParserTest {
             "https://www.virustotal.com/gui/home/upload",
             "https://www.kgeorgiy.info/courses/java-advanced/homeworks.html",
             "https://lichess.org/",
-            "https://www.overleaf.com/"
+            "https://www.overleaf.com/",
+            "https://vk.com/feed",
+            "https://habr.com/ru/all/",
+            "https://www.youtube.com/"
     );
 
     @Test

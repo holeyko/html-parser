@@ -75,6 +75,8 @@ public class HTMLParser extends AbstractParser<HTMLElement> {
                 if (!htmlElement.isSingle() && !htmlElement.isVoid()) {
                     parseTag(new TagContext(htmlElement, makeTagEnvironment(htmlElement)));
                     require(makeCloseTag(htmlElement.getTag()), false);
+                } else if (htmlElement.isVoid()) {
+                    checkStringAndSkip(makeCloseTag(htmlElement.getTag()), false);
                 }
                 context.parent().addChild(htmlElement);
             }
